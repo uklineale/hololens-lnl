@@ -9,33 +9,40 @@ public class VoiceCommands : MonoBehaviour {
 
     private KeywordRecognizer _keywordRecognizer;
     private Dictionary<string, Action> _commands;
-    private GameObject DemoArea;
+    private Vector3 _offset;
+    //private List<GameObject> _generatedList;
 
     public GameObject GeneratedCube;
     public GameObject GeneratedSphere;
 
 	// Use this for initialization
 	void Start () {
-        DemoArea = GameObject.Find("DemoArea");
+        _offset = new Vector3(0, 0, 0);
+        GameObject DemoArea = GameObject.Find("DemoArea");
         _commands = new Dictionary<string, Action>();
         _commands.Add("Cube", () =>
         {
             var genCube = Instantiate(GeneratedCube,
-                DemoArea.transform.position, Quaternion.identity) as GameObject;
+                DemoArea.transform.position + _offset, Quaternion.identity) as GameObject;
             genCube.transform.parent = DemoArea.transform;
+            _offset = _offset + new Vector3(2f, 0, 2f);
+            //_generatedList.Add(genCube);
         });
         _commands.Add("Sphere", () =>
         {
             var genSphere = Instantiate(GeneratedSphere,
-                DemoArea.transform.position, Quaternion.identity) as GameObject;
+                DemoArea.transform.position + _offset, Quaternion.identity) as GameObject;
             genSphere.transform.parent = DemoArea.transform;
+            _offset = _offset + new Vector3(2f, 0, 2f);
+            //_generatedList.Add(genSphere);
         });
-        _commands.Add("Destroy", () =>
+        _commands.Add("Reset", () =>
         {
             foreach (Transform child in DemoArea.transform)
             {
-                GameObject.Destroy(child);
+                GameObject.Destroy(child.gameObject);
             }
+            _offset = new Vector3(0, 0, 0);
         });
 
         _keywordRecognizer = new KeywordRecognizer(_commands.Keys.ToArray());
