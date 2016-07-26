@@ -8,34 +8,19 @@ using System.Linq;
 public class VoiceCommands : MonoBehaviour {
 
     private KeywordRecognizer _keywordRecognizer;
-    private Dictionary<string, Action> _commands;
-    private Vector3 _offset;
     //private List<GameObject> _generatedList;
 
     public GameObject GeneratedCube;
     public GameObject GeneratedSphere;
 
     private GameObject DemoArea;
+    private readonly string[] keywords = {"Cube", "Sphere", "Reset", "Enlarge", "Shrink", "Red", "Blue", "Yellow", "Green", "Gray", "Cyan", "Magenta", "Clear", "White", "Black"};
 
-	// Use this for initialization
-	void Start () {
-        _offset = new Vector3(0, 0, 0);
+// Use this for initialization
+void Start () {
         DemoArea = GameObject.Find("DemoArea");
 
-        _commands = new Dictionary<string, Action>();
-        _commands.Add("Cube", CreateCube);
-        _commands.Add("Sphere", CreateSphere);
-
-        _commands.Add("Reset", () =>
-        {
-            foreach (Transform child in DemoArea.transform)
-            {
-                GameObject.Destroy(child.gameObject);
-            }
-            _offset = new Vector3(0, 0, 0);
-        });
-
-        _keywordRecognizer = new KeywordRecognizer(_commands.Keys.ToArray());
+        _keywordRecognizer = new KeywordRecognizer(keywords);
         _keywordRecognizer.OnPhraseRecognized += CallCommand;
         _keywordRecognizer.Start();
     }
@@ -43,24 +28,52 @@ public class VoiceCommands : MonoBehaviour {
     void CreateShape(GameObject shape)
     {
         var genShape = Instantiate(shape,
-    DemoArea.transform.position + _offset, Quaternion.identity) as GameObject;
+    DemoArea.transform.position, Quaternion.identity) as GameObject;
         genShape.transform.parent = DemoArea.transform;
 
         genShape.GetComponent<Placement>().InitPlacement();
-
-        _offset = _offset + new Vector3(2f, 0, 2f);
     }
 
-    void CreateCube()
+    void ChangeColor(Color color)
     {
-        CreateShape(GeneratedCube);
+        foreach (Transform child in DemoArea.transform)
+        {
+            if (child.gameObject.GetComponent<Placement>().IsSelected == true)
+            {
+                child.gameObject.GetComponent<Renderer>().material.color = color;
+            }
+        }
     }
 
-    void CreateSphere()
+    void Enlarge()
     {
-        CreateShape(GeneratedSphere);
+        foreach (Transform child in DemoArea.transform)
+        {
+            if (child.gameObject.GetComponent<Placement>().IsSelected == true)
+            {
+                child.localScale += new Vector3(0.1f, 0.1f, 0.1f);
+            }
+        }
     }
 
+    void Shrink()
+    {
+        foreach (Transform child in DemoArea.transform)
+        {
+            if (child.gameObject.GetComponent<Placement>().IsSelected == true)
+            {
+                child.localScale -= new Vector3(0.1f, 0.1f, 0.1f);
+            }
+        }
+    }
+
+    void Reset()
+    {
+        foreach (Transform child in DemoArea.transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -69,10 +82,55 @@ public class VoiceCommands : MonoBehaviour {
 
     private void CallCommand(PhraseRecognizedEventArgs args)
     {
-        Action command;
-        if (_commands.TryGetValue(args.text, out command))
+        switch (args.text)
         {
-            command.Invoke();
+            case "Cube":
+                CreateShape(GeneratedCube);
+                break;
+            case "Sphere":
+                CreateShape(GeneratedSphere);
+                break;
+            case "Reset":
+                Reset();
+                break;
+            case "Enlarge":
+                Enlarge();
+                break;
+            case "Shrink":
+                Shrink();
+                break;
+            case "Red":
+                ChangeColor(Color.red);
+                break;
+            case "Blue":
+                ChangeColor(Color.blue);
+                break;
+            case "Yellow":
+                ChangeColor(Color.yellow);
+                break;
+            case "Green":
+                ChangeColor(Color.green);
+                break;
+            case "Grey":
+                ChangeColor(Color.gray);
+                break;
+            case "Cyan":
+                ChangeColor(Color.cyan);
+                break;
+            case "Magenta":
+                ChangeColor(Color.magenta);
+                break;
+            case "Clear":
+                ChangeColor(Color.clear);
+                break;
+            case "White":
+                ChangeColor(Color.white);
+                break;
+            case "Black":
+                ChangeColor(Color.black);
+                break;
+            default:
+                break;
         }
     }
 }

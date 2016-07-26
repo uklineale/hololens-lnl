@@ -6,7 +6,7 @@ using System;
 
 public class Placement : Singleton<Placement>
 {
-    private bool IsPlaced = false;
+    public bool IsSelected = true;
 
     private int MoveDistance = 2;
 
@@ -17,12 +17,12 @@ public class Placement : Singleton<Placement>
 
     public void InitPlacement()
     {
-        IsPlaced = false;
+        IsSelected = true;
     }
 
     void Update()
     {
-        if(!IsPlaced)
+        if(IsSelected)
         {
             //Debug.LogFormat("Enter Update Else");
             transform.position = Vector3.Lerp(transform.position, ProposeTransformPosition(), 0.2f);
@@ -40,7 +40,7 @@ public class Placement : Singleton<Placement>
 
     void OnSelect()
     {
-        IsPlaced = !IsPlaced;
+        IsSelected = !IsSelected;
     }
 
     /// <summary>
